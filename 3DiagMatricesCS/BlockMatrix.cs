@@ -21,9 +21,9 @@ namespace _3DiagMatricesCS
             get { return matrixDimension; }
             private set
             {
-                if (matrixDimension <= 0)
+                if (matrixDimension <= 1)
                 {
-                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.MatrixDimension: matrix dimension should be a positive number.");
+                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.MatrixDimension: block matrix dimension should be 2 or bigger.");
                 }
                 matrixDimension = value;
             }
@@ -106,9 +106,9 @@ namespace _3DiagMatricesCS
                     // Initialize rows 1 to (BlockDimension - 2)
                     for (uint i = 0; i < 3; ++i)  // For every diagonal
                     {
-                        for (uint j = 0; j < MatrixDimension - 2; ++j)  // For every non-end block in the diagonal
+                        for (uint j = 1; j < MatrixDimension - 1; ++j)  // For every non-end block in the diagonal
                         {
-                            matrix[i][j] = new Block(BlockDimension, values[2 + 3 * j + i]);  // Offset + number of the row + number of the diagonal
+                            matrix[i][j] = new Block(BlockDimension, values[2 + 3 * (j - 1) + i]);  // First rows' offset + number of the diagonal
                         }
                     }
 
@@ -129,10 +129,10 @@ namespace _3DiagMatricesCS
                     // Initialize rows 1 to (BlockDimension - 2)
                     for (uint i = 0; i < 3; ++i)  // For every diagonal
                     {
-                        for (uint j = 0; j < MatrixDimension - 2; ++j)  // For every non-end block in the diagonal
+                        for (uint j = 1; j < MatrixDimension - 1; ++j)  // For every non-end block in the diagonal
                         {
                             matrix[i][j] = new Block(BlockDimension, values,
-                                                     start: (2 + 3 * j + i) * BlockDimension);   // (Offset + number of the row + number of the diagonal)
+                                                     start: (2 + 3 * (j - 1) + i) * BlockDimension);  // (First rows' offset + number of the diagonal)
                                                                                                  // times BlockDimension is the starting index for the
                                                                                                  // current block's parameters
                         }
@@ -184,9 +184,49 @@ namespace _3DiagMatricesCS
         }
 
         // Operators
-        public static double[] operator*(BlockMatrix block, double[] vec)
+        public static double[] operator*(BlockMatrix mat, double[] vec)
         {
-            double[] result = 
+            if (vec.Length != mat.MatrixDimension * mat.BlockDimension)
+            {
+                throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.operator*: Dimensions do not match.");
+            }
+
+            double[] result = new double[mat.MatrixDimension * mat.BlockDimension];  // Initialized with zeroes, just to be safe
+            double[][] buffers = new double[3][];  // These buffers can be omitted if summation of two double[] objects is defined (element-by-element)
+
+            // First row has only two blocks
+            mat.matrix[1][0].MultiplyWithVec(vec, start: 0, result: buffers[1]);  // C(0) * vec[0 : BlockDimension]
+            mat.matrix[2][0].MultiplyWithVec(vec, start: mat.BlockDimension, result: buffers[2]);  // B(0) * vec[BlockDimension : 2 * BlockDimension]
+            for (uint k = 0; k < mat.BlockDimension; ++k)  // Sum buffers element-by-element
+            {
+                result[k] = buffers[1][k] + buffers[2][k];
+            }
+
+
+            // Compute rows that are not in corner blocks (neither first nor last block)
+            for (uint j = 1; j < mat.MatrixDimension - j; ++j)  // For every non-end row
+            {
+                for (uint i = 0; i < 3; ++i)  // For every diagonal (A, C, B)
+                {
+                    // Multiply one block with a subset of vec
+                    mat.matrix[i][j].MultiplyWithVec(vec, start: (j - i - 1) * mat.BlockDimension, result: buffers[i]);
+                }
+
+                // Now we have all three double[] objects; let's sum them 
+
+                for (uint k = 0; k < mat.BlockDimension; ++k)
+                {
+                    // Summation is hardcoded (as opposed to using a loop) on purpose: code is a huge mess already, and this place
+                    // is one of the anchors that can remind us where we are
+                    result[j * mat.BlockDimension + k] = buffers[0][k] + buffers[1][k] + buffers[2][k];  // Buffers' length in blocks is 1,
+                                                                                                                 // result's length in blocks is MatrixDimension 
+                }
+            }
+
+            // Last row has only two blocks
+
+
+            return result;
         }
 
     }

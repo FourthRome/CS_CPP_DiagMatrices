@@ -9,14 +9,20 @@ namespace _3DiagMatricesCS
     public class Block  // Class to represent a block in a block matrix.
                         // Each block here is a diagonal matrix of an arbitrary dimension. 
     {
+        //----------
         // Constants
+        //----------
         static double EPSILON = 1e-10;
 
+        //---------------
         // Private fields
+        //---------------
         uint dimension;
         double[] matrix;
 
+        //------------------
         // Public properties
+        //------------------
         public uint Dimension
         {
             get { return dimension; }
@@ -30,7 +36,9 @@ namespace _3DiagMatricesCS
             }
         }
    
+        //-------------
         // Constructors
+        //-------------
         public Block(uint dimension, params double[] values)  // Most default constructor
         {
             try // Set up block dimension and forward exceptions, if any
@@ -111,9 +119,10 @@ namespace _3DiagMatricesCS
             }
         }
 
+        //----------
         // Operators
-        // Block addition
-        public static Block operator+(Block a, Block b)
+        //----------
+        public static Block operator+(Block a, Block b)  // Block addition
         {
             Block result = new Block(a.Dimension);
             for (uint i = 0; i < a.Dimension; ++i)
@@ -123,8 +132,7 @@ namespace _3DiagMatricesCS
             return result;
         }
 
-        // Block negation
-        public static Block operator-(Block a)
+        public static Block operator-(Block a)  // Block negation
         {
             Block result = new Block(a.Dimension);
             for (uint i = 0; i < a.Dimension; ++i)
@@ -134,8 +142,7 @@ namespace _3DiagMatricesCS
             return result;
         }
 
-        // Block subtraction
-        public static Block operator-(Block a, Block b)
+        public static Block operator-(Block a, Block b)  // Block subtraction
         {
             Block result = new Block(a.Dimension);
             for (uint i = 0; i < a.Dimension; ++i)
@@ -145,8 +152,7 @@ namespace _3DiagMatricesCS
             return result;
         }
 
-        // Block multiplication
-        public static Block operator*(Block a, Block b)
+        public static Block operator*(Block a, Block b)  // Block multiplication
         {
             Block result = new Block(a.Dimension);
             for (uint i = 0; i < a.Dimension; ++i)
@@ -156,52 +162,53 @@ namespace _3DiagMatricesCS
             return result;
         }
 
-        // Block-vector multiplication
-        public static double[] operator*(Block block, double[] vec)
+        
+        public static double[] operator*(Block block, double[] vec)  // Block-vector multiplication
         {
             if (vec.Length != block.Dimension)
             {
                 throw new ArgumentException("_3DiagMatricesCS.Block.operator*: Dimensions do not match.");
             }
-            else
-            {
-                double[] result = new double[block.Dimension];
-                for (uint i = 0; i < block.Dimension; ++i)
-                {
-                    result[i] = block.matrix[i] * vec[i];
-                }
-                return result;
-            }
-        }
-
-        // Block-vector multiplication (version with array of bigger size)
-        public double[] MultiplyWithVec(double[] vec, uint start=0, uint len=0, double[] result=null)
-        {
-            if (start + len > vec.Length)
-            {
-                throw new ArgumentException("_3DiagMatricesCS.Block.MultiplyWithVec: .")
-            }
-
-        }
-
-        // Calculate inverse matrix
-        public static Block inverse(Block block)
-        {
-            if (block.isSingular())
-            {
-                throw new ArithmeticException("_3DiagMatricesCS.Block.inverse: can't compute inverse of a singular matrix.");
-            }
-
-            Block result = new Block(block.Dimension);
+            
+            double[] result = new double[block.Dimension];
             for (uint i = 0; i < block.Dimension; ++i)
             {
-                result.matrix[i] = 1 / block.matrix[i];
+                result[i] = block.matrix[i] * vec[i];
             }
             return result;
         }
 
-        // A utility to check matrix
-        public bool isSingular()
+        //--------
+        // Methods
+        //--------
+        public double[] MultiplyWithVec(double[] vec, uint start=0,
+                                        double[] result=null, uint resultStart=0)  // Block-vector multiplication (version with array of bigger size)
+        {
+            if (start + Dimension > vec.Length)  // Check if start and len are specified correctly (vector can be longer than block)
+            {
+                throw new ArgumentException("_3DiagMatricesCS.Block.MultiplyWithVec: Vector doesn't have enough values in it (check vec and start parameters).");
+            }
+
+            if (result == null)  // Create new array if storage for the result was not provided
+            {
+                result = new double[Dimension];
+            }
+
+            if (resultStart + Dimension > result.Length)  // Check if there is enough space to store the result (it should not 
+            {
+                throw new ArgumentException("_3DiagMatricesCS.Block.MultiplyWithVec: Not enough space to store the result (check result and resultStart parameters).");
+            }
+
+            for (uint i = 0; i < Dimension; ++i)
+            {
+                result[resultStart + i] = matrix[i] * vec[start + i];
+            }
+            return result;  // Note: return value can be an existing array passed to the function as a parameter.
+                            // Does this have any effect on GC? Should we consider returning null instead?
+        }
+
+        
+        public bool isSingular()  // Needed in Block.inverse() method
         {
             for (uint i = 0; i < Dimension; ++i)
             {
@@ -212,5 +219,26 @@ namespace _3DiagMatricesCS
             }
             return false;
         }
+
+        //---------------
+        // Static methods
+        //---------------
+
+        public static Block inverse(Block block)  // Calculate inverse matrix
+        {
+            if (block.isSingular())  // Check if inverse matrix exists
+            {
+                throw new ArithmeticException("_3DiagMatricesCS.Block.inverse: Can't compute inverse of a singular matrix.");
+            }
+
+            Block result = new Block(block.Dimension);
+            for (uint i = 0; i < block.Dimension; ++i)  // Luckily, our matrix is diagonal, so 
+            {
+                result.matrix[i] = 1 / block.matrix[i];
+            }
+            return result;
+        }
+
+        
     }
 }
