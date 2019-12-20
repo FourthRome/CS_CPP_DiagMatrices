@@ -17,13 +17,13 @@ namespace _3DiagMatricesCS
         //---------------
         // Private fields
         //---------------
-        uint dimension;
+        int dimension;
         double[] matrix;
 
         //------------------
         // Public properties
         //------------------
-        public uint Dimension
+        public int Dimension
         {
             get { return dimension; }
             private set
@@ -39,7 +39,7 @@ namespace _3DiagMatricesCS
         //-------------
         // Constructors
         //-------------
-        public Block(uint dimension, params double[] values)  // Most default constructor
+        public Block(int dimension, params double[] values)  // Most default constructor
         {
             try // Set up block dimension and forward exceptions, if any
             {
@@ -60,21 +60,21 @@ namespace _3DiagMatricesCS
                 // Initialize matrix elements
                 if (values.Length == 0)  // Create an empty matrix of the specified size
                 {
-                    for (uint i = 0; i < Dimension; ++i)
+                    for (int i = 0; i < Dimension; ++i)
                     {
                         matrix[i] = 0;
                     }
                 }
                 else if (values.Length == 1)  // Create scalar matrix
                 {
-                    for (uint i = 0; i < Dimension; ++i)
+                    for (int i = 0; i < Dimension; ++i)
                     {
                         matrix[i] = values[0];
                     }
                 }
                 else  // Each element of a diagonal matrix is provided explicitly
                 {
-                    for (uint i = 0; i < Dimension; ++i)
+                    for (int i = 0; i < Dimension; ++i)
                     {
                         matrix[i] = values[i];
                     }
@@ -90,13 +90,13 @@ namespace _3DiagMatricesCS
         {
             Dimension = other.Dimension;  // No exception expected
             matrix = new double[Dimension];
-            for (uint i = 0; i < Dimension; ++i)
+            for (int i = 0; i < Dimension; ++i)
             {
                 matrix[i] = other.matrix[i];
             }
         }
 
-        public Block(uint dimension, double[] values, uint start = 0)  // Construct Block from double[]
+        public Block(int dimension, double[] values, int start = 0)  // Construct Block from double[]
         {
             try // Set up block dimension and forward exceptions, if any
             {
@@ -113,7 +113,7 @@ namespace _3DiagMatricesCS
 
             matrix = new double[Dimension];  // Arguments are acceptable, so we can allocate memory
 
-            for (uint i = 0; i < Dimension; ++i)  // Initialize matrix with values from double[], starting from the "start" index
+            for (int i = 0; i < Dimension; ++i)  // Initialize matrix with values from double[], starting from the "start" index
             {
                 matrix[i] = values[start + i];
             }
@@ -125,7 +125,7 @@ namespace _3DiagMatricesCS
         public static Block operator+(Block a, Block b)  // Block addition
         {
             Block result = new Block(a.Dimension);
-            for (uint i = 0; i < a.Dimension; ++i)
+            for (int i = 0; i < a.Dimension; ++i)
             {
                 result.matrix[i] = a.matrix[i] + b.matrix[i];
             }
@@ -135,7 +135,7 @@ namespace _3DiagMatricesCS
         public static Block operator-(Block a)  // Block negation
         {
             Block result = new Block(a.Dimension);
-            for (uint i = 0; i < a.Dimension; ++i)
+            for (int i = 0; i < a.Dimension; ++i)
             {
                 result.matrix[i] = -a.matrix[i];
             }
@@ -145,7 +145,7 @@ namespace _3DiagMatricesCS
         public static Block operator-(Block a, Block b)  // Block subtraction
         {
             Block result = new Block(a.Dimension);
-            for (uint i = 0; i < a.Dimension; ++i)
+            for (int i = 0; i < a.Dimension; ++i)
             {
                 result.matrix[i] = a.matrix[i] - b.matrix[i];
             }
@@ -155,7 +155,7 @@ namespace _3DiagMatricesCS
         public static Block operator*(Block a, Block b)  // Block multiplication
         {
             Block result = new Block(a.Dimension);
-            for (uint i = 0; i < a.Dimension; ++i)
+            for (int i = 0; i < a.Dimension; ++i)
             {
                 result.matrix[i] = a.matrix[i] * b.matrix[i];
             }
@@ -171,7 +171,7 @@ namespace _3DiagMatricesCS
             }
             
             double[] result = new double[block.Dimension];
-            for (uint i = 0; i < block.Dimension; ++i)
+            for (int i = 0; i < block.Dimension; ++i)
             {
                 result[i] = block.matrix[i] * vec[i];
             }
@@ -181,8 +181,8 @@ namespace _3DiagMatricesCS
         //--------
         // Methods
         //--------
-        public double[] MultiplyWithVec(double[] vec, uint start=0,
-                                        double[] result=null, uint resultStart=0)  // Block-vector multiplication (version with array of bigger size)
+        public double[] MultiplyWithVec(double[] vec, int start=0,
+                                        double[] result=null, int resultStart=0)  // Block-vector multiplication (version with array of bigger size)
         {
             if (start + Dimension > vec.Length)  // Check if start and len are specified correctly (vector can be longer than block)
             {
@@ -194,12 +194,12 @@ namespace _3DiagMatricesCS
                 result = new double[Dimension];
             }
 
-            if (resultStart + Dimension > result.Length)  // Check if there is enough space to store the result (it should not 
+            if (resultStart + Dimension > result.Length)  // Check if there is enough space to store the result
             {
                 throw new ArgumentException("_3DiagMatricesCS.Block.MultiplyWithVec: Not enough space to store the result (check result and resultStart parameters).");
             }
 
-            for (uint i = 0; i < Dimension; ++i)
+            for (int i = 0; i < Dimension; ++i)
             {
                 result[resultStart + i] = matrix[i] * vec[start + i];
             }
@@ -208,9 +208,9 @@ namespace _3DiagMatricesCS
         }
 
         
-        public bool isSingular()  // Needed in Block.inverse() method
+        public bool IsSingular()  // Needed in Block.Inverse() method
         {
-            for (uint i = 0; i < Dimension; ++i)
+            for (int i = 0; i < Dimension; ++i)
             {
                 if (Math.Abs(matrix[i]) < EPSILON)
                 {
@@ -224,15 +224,15 @@ namespace _3DiagMatricesCS
         // Static methods
         //---------------
 
-        public static Block inverse(Block block)  // Calculate inverse matrix
+        public static Block Inverse(Block block)  // Calculate inverse matrix
         {
-            if (block.isSingular())  // Check if inverse matrix exists
+            if (block.IsSingular())  // Check if inverse matrix exists
             {
                 throw new ArithmeticException("_3DiagMatricesCS.Block.inverse: Can't compute inverse of a singular matrix.");
             }
 
             Block result = new Block(block.Dimension);
-            for (uint i = 0; i < block.Dimension; ++i)  // Luckily, our matrix is diagonal, so 
+            for (int i = 0; i < block.Dimension; ++i)  // Luckily, our matrix is diagonal, so 
             {
                 result.matrix[i] = 1 / block.matrix[i];
             }
