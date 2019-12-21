@@ -220,6 +220,37 @@ namespace _3DiagMatricesCS
             return false;
         }
 
+        public string RowToString(int row)
+        {
+            if (row < 0 || row >= Dimension)
+            {
+                throw new IndexOutOfRangeException("_3DiagMatricesCS.Block.RowToString: Matrix has no row with that index.");
+            }
+
+            StringBuilder result = new StringBuilder();
+
+            result.Append(String.Concat(Enumerable.Repeat("0 ", row)));
+            result.Append($"{matrix[row]} ");
+            result.Append(String.Concat(Enumerable.Repeat("0 ", Dimension - 1 - row)));
+            result.Length -= 1;
+
+            return result.ToString();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder str = new StringBuilder();
+
+            for (int i = 0; i < Dimension; ++i)
+            {
+                str.Append(RowToString(i));
+                str.AppendLine();
+            }
+
+            str.Length -= 1;
+            return str.ToString();
+        }
+
         //---------------
         // Static methods
         //---------------

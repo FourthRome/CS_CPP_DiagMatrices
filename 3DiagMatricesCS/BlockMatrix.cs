@@ -264,14 +264,26 @@ namespace _3DiagMatricesCS
                 file = new FileStream(filename, FileMode.Append);
                 StreamWriter writer = new StreamWriter(file);
 
+                writer.WriteLine($"Equation solved at: {DateTime.Now}");
                 writer.WriteLine();
+                
+                writer.WriteLine("Matrix:");
+                writer.WriteLine(ToString());
                 writer.WriteLine();
 
+                writer.WriteLine("Right part (transposed):");
+                writer.WriteLine($"[{fVec}]");
+                writer.WriteLine();
+
+                writer.WriteLine("Solution (transposed):");
+                writer.WriteLine($"[{xVec}]");
+                writer.WriteLine();
+                
                 writer.Close();
             }
             catch (Exception e)
             {
-                throw new Exception("_3DiagMatricesCS.BlockMatrix.SaveToFile: some I/O error occurred.", e);
+                throw new Exception("_3DiagMatricesCS.BlockMatrix.SaveToFile: Some I/O error occurred.", e);
             }
             finally
             {
@@ -280,6 +292,44 @@ namespace _3DiagMatricesCS
                     file.Close();
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            string zeroString = (new Block(BlockDimension)).RowToString(0);
+            StringBuilder buffer = new StringBuilder();
+
+            for (int j = 0; j < MatrixDimension; ++j)
+            {
+                for (int k = 0; k < BlockDimension; ++k)
+                {
+                    for (int p = 0; p < j; ++p)
+                    {
+                        buffer.Append(zeroString);
+                        buffer.Append(" | ");
+                    }
+
+                    for (int i = (j == 0 ? 1 : 0); i < (j == (MatrixDimension - 1) ? 2 : 3); ++i)
+                    {
+                        buffer.Append(matrix[i][0].RowToString(k));
+                        buffer.Append(" | ");
+                    }
+
+                    for (int p = j + 1; p < BlockDimension; ++p)
+                    {
+                        buffer.Append(zeroString);
+                        buffer.Append(" | ");
+                    }
+                    buffer.Length -= " | ".Length;
+                    buffer.AppendLine();
+                }
+
+                buffer.AppendLine("***");
+            }
+
+            buffer.Length -= "***".Length + 1;
+
+            return buffer.ToString();
         }
 
         //---------------
@@ -369,8 +419,6 @@ namespace _3DiagMatricesCS
 
             return result;
         }
-
-
 
     }
 }
