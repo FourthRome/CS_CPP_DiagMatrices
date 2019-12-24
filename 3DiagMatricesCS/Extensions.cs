@@ -20,7 +20,7 @@ namespace _3DiagMatricesCS
             {
                 result.Append($"{arr[i]} ");
             }
-
+            
             if (arr.Length > 0)
             {
                 result.Length -= 1;

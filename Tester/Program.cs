@@ -11,5 +11,10 @@ namespace Tester
         static void Main(string[] args)
         {
         }
+
+        void Test()
+        {
+
+        }
     }
 }
