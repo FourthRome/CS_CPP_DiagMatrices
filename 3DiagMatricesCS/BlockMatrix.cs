@@ -7,7 +7,7 @@ using System.IO;
 
 namespace _3DiagMatricesCS
 {
-    class BlockMatrix  // Class to represent 3-diagonal matrix consisting of diagonal blocks
+    public class BlockMatrix  // Class to represent 3-diagonal matrix consisting of diagonal blocks
     {
         //----------
         // Constants
@@ -28,9 +28,9 @@ namespace _3DiagMatricesCS
             get { return matrixDimension; }
             private set
             {
-                if (matrixDimension <= 1)
+                if (value <= 1)
                 {
-                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.MatrixDimension: block matrix dimension should be 2 or bigger.");
+                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.MatrixDimension: Block matrix dimension should be 2 or bigger.");
                 }
                 matrixDimension = value;
             }
@@ -38,12 +38,12 @@ namespace _3DiagMatricesCS
 
         public int BlockDimension
         {
-            get { return BlockDimension; }
+            get { return blockDimension; }
             private set
             {
-                if (blockDimension <= 0)
+                if (value <= 0)
                 {
-                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.BlockDimension: block dimension should be a positive number.");
+                    throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.BlockDimension: Block dimension should be a positive number.");
                 }
                 blockDimension = value;
             }
@@ -52,7 +52,7 @@ namespace _3DiagMatricesCS
         //-------------
         // Constructors
         //-------------
-        BlockMatrix(int matrixDimension, int blockDimension, params double[] values)  // Most default constructor
+        public BlockMatrix(int matrixDimension, int blockDimension, params double[] values)  // Most default constructor
         {
             try  // Set up matrix dimensions and forward exceptions, if any
             {
@@ -80,7 +80,12 @@ namespace _3DiagMatricesCS
                 // Initialize matrix elements
                 if (values.Length == 0)  // Create default matrix - it is used in Test (from "Tester" project)
                 {
-                    
+                    for (int j = 0; j < MatrixDimension; ++j)
+                    {
+                        matrix[0][j] = new Block(BlockDimension);
+                        matrix[1][j] = new Block(BlockDimension, j);
+                        matrix[2][j] = new Block(BlockDimension);
+                    }
 
                 }
                 else if (values.Length == 1)  // Create 1-diagonal scalar matrix (each block of the main diagonal is scalar with the same value)
@@ -161,7 +166,7 @@ namespace _3DiagMatricesCS
             }
         }
 
-        BlockMatrix(BlockMatrix other) // Make a deep copy of another BlockMatrix
+        public BlockMatrix(BlockMatrix other) // Make a deep copy of another BlockMatrix
         {
             MatrixDimension = other.MatrixDimension;  // No exceptions expected here
             BlockDimension = other.BlockDimension;
@@ -177,17 +182,17 @@ namespace _3DiagMatricesCS
             }
         }
 
-        BlockMatrix(int matrixDimension, Block[] aDiag, Block[] cDiag, Block[] bDiag)
+        public BlockMatrix(int matrixDimension, Block[] aDiag, Block[] cDiag, Block[] bDiag)
         {
 
         }
 
-        BlockMatrix(int matrixDimension, int blockDimension, double[] aDiag, double[] cDiag, double[] bDiag)
+        public BlockMatrix(int matrixDimension, int blockDimension, double[] aDiag, double[] cDiag, double[] bDiag)
         {
 
         }
 
-        BlockMatrix(int matrixDimension, int blockDimension, double[][] values)
+        public BlockMatrix(int matrixDimension, int blockDimension, double[][] values)
         {
 
         }
@@ -303,7 +308,7 @@ namespace _3DiagMatricesCS
             {
                 for (int k = 0; k < BlockDimension; ++k)
                 {
-                    for (int p = 0; p < j; ++p)
+                    for (int p = 0; p < j - 1; ++p)
                     {
                         buffer.Append(zeroString);
                         buffer.Append(" | ");
@@ -311,11 +316,11 @@ namespace _3DiagMatricesCS
 
                     for (int i = (j == 0 ? 1 : 0); i < (j == (MatrixDimension - 1) ? 2 : 3); ++i)
                     {
-                        buffer.Append(matrix[i][0].RowToString(k));
+                        buffer.Append(matrix[i][j].RowToString(k));
                         buffer.Append(" | ");
                     }
 
-                    for (int p = j + 1; p < BlockDimension; ++p)
+                    for (int p = j + 2; p < BlockDimension; ++p)
                     {
                         buffer.Append(zeroString);
                         buffer.Append(" | ");
@@ -327,9 +332,7 @@ namespace _3DiagMatricesCS
                 buffer.AppendLine("***");
             }
 
-            buffer.Length -= "***".Length + 1;
-
-            return buffer.ToString();
+            return buffer.ToString().TrimEnd('\r', '\n', '*');
         }
 
         //---------------

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _3DiagMatricesCS
 {
-    struct VectorDouble
+    public struct VectorDouble
     {
         double[] vec;
 

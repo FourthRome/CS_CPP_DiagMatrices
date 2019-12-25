@@ -232,9 +232,8 @@ namespace _3DiagMatricesCS
             result.Append(String.Concat(Enumerable.Repeat("0 ", row)));
             result.Append($"{matrix[row]} ");
             result.Append(String.Concat(Enumerable.Repeat("0 ", Dimension - 1 - row)));
-            result.Length -= 1;
 
-            return result.ToString();
+            return result.ToString().TrimEnd();
         }
 
         public override string ToString()
@@ -247,8 +246,7 @@ namespace _3DiagMatricesCS
                 str.AppendLine();
             }
 
-            str.Length -= 1;
-            return str.ToString();
+            return str.ToString().TrimEnd();
         }
 
         //---------------

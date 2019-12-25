@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace _3DiagMatricesCS
 {
     [Serializable]
-    class TestTime
+    public class TestTime
     {
         //---------------
         // Private fields
@@ -64,6 +64,7 @@ namespace _3DiagMatricesCS
             }
             catch (Exception e)
             {
+                Console.WriteLine($"_3DiagMatricesCS.Save: Failed to save log to file. Error message: {e.Message}");
                 result = false;
             }
             finally
@@ -90,6 +91,7 @@ namespace _3DiagMatricesCS
             }
             catch (Exception e)
             {
+                Console.WriteLine($"_3DiagMatricesCS.Load: Failed to load log from file. Error message: {e.Message}");
                 result = false;
             }
             finally

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _3DiagMatricesCS
 {
-    static class Extensions
+    public static class Extensions
     {
         public static string ToString(this double[] arr)
         {

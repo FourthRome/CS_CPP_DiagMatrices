@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\3DiagMatricesCS\3DiagMatricesCS.csproj">
+      <Project>{4510a879-9869-4f7a-bae4-a9b2bd53e3ad}</Project>
+      <Name>3DiagMatricesCS</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
