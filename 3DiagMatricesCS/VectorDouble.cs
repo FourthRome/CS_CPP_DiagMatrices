@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _3DiagMatricesCS
 {
@@ -69,10 +65,5 @@ namespace _3DiagMatricesCS
             }
             return result;
         }
-
-        //public static explicit operator VectorDouble(double[] arr)
-        //{
-        //    return new VectorDouble(arr);
-        //}
     }
 }

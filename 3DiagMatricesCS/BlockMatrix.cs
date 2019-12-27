@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace _3DiagMatricesCS
@@ -80,11 +77,24 @@ namespace _3DiagMatricesCS
                 // Initialize matrix elements
                 if (values.Length == 0)  // Create default matrix - it is used in Test (from "Tester" project)
                 {
+                    double[][] initialValues = new double[3][];
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        initialValues[i] = new double[BlockDimension];
+                    }
+
+                    for (int k = 0; k < BlockDimension; ++k)
+                    {
+                        initialValues[0][k] = k % 11 + 1;
+                        initialValues[1][k] = (k + 2) % 5 + 15;
+                        initialValues[2][k] = (k + 8) % 13 + 1;
+                    }
+
                     for (int j = 0; j < MatrixDimension; ++j)
                     {
-                        matrix[0][j] = new Block(BlockDimension);
-                        matrix[1][j] = new Block(BlockDimension, j);
-                        matrix[2][j] = new Block(BlockDimension);
+                        matrix[0][j] = new Block(BlockDimension, initialValues[0]);
+                        matrix[1][j] = new Block(BlockDimension, initialValues[1]);
+                        matrix[2][j] = new Block(BlockDimension, initialValues[2]);
                     }
 
                 }
@@ -182,20 +192,33 @@ namespace _3DiagMatricesCS
             }
         }
 
-        public BlockMatrix(int matrixDimension, Block[] aDiag, Block[] cDiag, Block[] bDiag)
-        {
+        //public BlockMatrix(int matrixDimension, Block[] aDiag, Block[] cDiag, Block[] bDiag)
+        //{
 
-        }
+        //}
 
-        public BlockMatrix(int matrixDimension, int blockDimension, double[] aDiag, double[] cDiag, double[] bDiag)
-        {
+        //public BlockMatrix(int matrixDimension, int blockDimension, double[] aDiag, double[] cDiag, double[] bDiag)
+        //{
+        //    try  // Set up matrix dimensions and forward exceptions, if any
+        //    {
+        //        MatrixDimension = matrixDimension;
+        //        BlockDimension = blockDimension;
+        //    }
+        //    catch (ArgumentException e)
+        //    {
+        //        throw new ArgumentException("_3DiagMatricesCS.BlockMatrix.BlockMatrix: At least one of the dimensions is incorrect.", e);
+        //    }
 
-        }
+        //    if (aDiag.Length)
+        //}
 
-        public BlockMatrix(int matrixDimension, int blockDimension, double[][] values)
-        {
-
-        }
+        //public BlockMatrix(int matrixDimension, int blockDimension, double[][] values)
+        //{
+        //    try
+        //    {
+        //        this(matrixDimension, blockDimension, values[0], values[1], values[2]);
+        //    }
+        //}
 
         //----------
         // Operators
@@ -261,7 +284,7 @@ namespace _3DiagMatricesCS
         // Methods
         //--------
 
-        public void SaveToFile(double[] fVec, double[] xVec, string filename="./result_cpp.txt")
+        public void SaveToFile(double[] fVec, double[] xVec, string filename)
         {
             FileStream file = null;
             try
@@ -277,11 +300,11 @@ namespace _3DiagMatricesCS
                 writer.WriteLine();
 
                 writer.WriteLine("Right part (transposed):");
-                writer.WriteLine($"[{fVec}]");
+                writer.WriteLine($"[{fVec.ToStringRow()}]");
                 writer.WriteLine();
 
                 writer.WriteLine("Solution (transposed):");
-                writer.WriteLine($"[{xVec}]");
+                writer.WriteLine($"[{xVec.ToStringRow()}]");
                 writer.WriteLine();
                 
                 writer.Close();
@@ -338,7 +361,7 @@ namespace _3DiagMatricesCS
         //---------------
         // Static methods
         //---------------
-        public static double[] SolveSystem(BlockMatrix mat, double[] vec, double[] result=null)
+        public static double[] SolveSystem(BlockMatrix mat, double[] vec, double[] result = null, bool saveToFile = false, string filename= "./result_cs.txt")
         {
             int matDim = mat.MatrixDimension;  // Aliases for dimensions
             int bloDim = mat.BlockDimension;   // (first written without them, the code was too large)
@@ -404,7 +427,7 @@ namespace _3DiagMatricesCS
 
             for (int j = matDim - 2; j >= 0; --j)  // Fill in other X-s, thus completing the result
             {
-                alphas[j + 1].MultiplyWithVec(vec, (j + 1) * bloDim, buffer);  // Here's why we need buffer
+                alphas[j + 1].MultiplyWithVec(result, (j + 1) * bloDim, buffer);  // Here's why we need buffer
                 buffer = new VectorDouble(betas[j + 1]) - buffer;  // And here
 
                 for (int k = 0; k < bloDim; ++k)  // If we didn't have to iterate through the values to fill this block of result,
@@ -418,7 +441,10 @@ namespace _3DiagMatricesCS
             // Saving results to file
             //-----------------------
 
-            mat.SaveToFile(vec, result);
+            if (saveToFile)
+            {
+                mat.SaveToFile(vec, result, filename);
+            }
 
             return result;
         }

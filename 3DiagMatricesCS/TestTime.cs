@@ -40,7 +40,7 @@ namespace _3DiagMatricesCS
 
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder("Log of performance checks on matrix equations' solutions:");
+            StringBuilder result = new StringBuilder();
             foreach (var logString in log)
             {
                 result.AppendLine(logString);
@@ -104,10 +104,9 @@ namespace _3DiagMatricesCS
             return result;
         }
 
-        public static string FormatString(int matDim, int bloDim, long csTime, long cppTime, double ratio)
+        public static string FormatString(int matDim, int bloDim, double csTime, double cppTime, double ratio)
         {
-            return $"Equation with block matrix ({matDim} blocks wide), where each block is {bloDim} wide, was solved in " +
-                   $"{csTime} milliseconds by C# program and in {cppTime} milliseconds by C++ program, giving us performance ratio of {ratio}.";
+            return $"Порядок матрицы: {matDim}, порядок блока: {bloDim}, время C#: {csTime} миллисекунд, С++: {cppTime} миллисекунд, коэффициент C#/C++: {ratio}.";
         }
     }
 }
