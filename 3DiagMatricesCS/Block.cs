@@ -176,6 +176,18 @@ namespace _3DiagMatricesCS
             return result;
         }
 
+        public double this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= Dimension)
+                {
+                    throw new IndexOutOfRangeException("_3DiagMatricesCS.Block.this[]: Incorrect index.");
+                }
+                return matrix[index];
+            }
+        }
+
         //--------
         // Methods
         //--------

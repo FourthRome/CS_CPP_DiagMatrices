@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Tester
 {
@@ -106,9 +107,10 @@ namespace Tester
                         continue;
                     }
 
+                    BlockMatrix mat;
                     try  // C# solution
                     {
-                        BlockMatrix mat = new BlockMatrix(matDim, bloDim);
+                        mat = new BlockMatrix(matDim, bloDim);
                         Stopwatch watch = new Stopwatch();
 
                         try
@@ -152,7 +154,7 @@ namespace Tester
 
                     try  // CPP solution
                     {
-                        
+                        SolveEquationCpp(matDim, bloDim, mat.ToPlainArray(), rightSide, cppResult, ref cppTime);
                     }
                     catch (Exception e)
                     {
@@ -165,8 +167,9 @@ namespace Tester
                         continue;
                     }
 
+                    double ratio = (cppTime > 0) ? ((double)csTime) / cppTime : -1;
 
-                    log.Add(TestTime.FormatString(matDim, bloDim, csTime, cppTime, 0));
+                    log.Add(TestTime.FormatString(matDim, bloDim, csTime, cppTime, ratio));
                 }
             }
 
@@ -244,11 +247,24 @@ namespace Tester
             Console.WriteLine();
             Console.WriteLine((mat * csResult).ToStringRow());
             Console.WriteLine();
+
+            double[] cppResult = new double[rightSide.Length];
+            double time = 0;
+            SolveEquationCpp(mat.MatrixDimension, mat.BlockDimension, matrixValues, rightSide, cppResult, ref time);
+
+            Console.WriteLine("Код на C++ выдал решение:");
+            Console.WriteLine();
+            Console.WriteLine(cppResult.ToStringColumn());
+            Console.WriteLine();
+
+            Console.WriteLine("Которое при умножении на матрицу слева даёт:");
+            Console.WriteLine();
+            Console.WriteLine((mat * cppResult).ToStringRow());
+            Console.WriteLine();
         }
 
-        static void SolveEquationCpp()
-        {
-
-        }
+        [DllImport("../../../Debug/3DiagMatricesCPP.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SolveEquationCpp(int matDim, int bloDim, double[] matrix, double[] rightSide, double[] result,
+                                                   ref double time, [MarshalAs(UnmanagedType.U1)] bool saveToFile=false, string filename= "./result_cpp.txt");
     }
 }

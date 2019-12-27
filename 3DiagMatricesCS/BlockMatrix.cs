@@ -358,6 +358,24 @@ namespace _3DiagMatricesCS
             return buffer.ToString().TrimEnd('\r', '\n', '*');
         }
 
+        public double[] ToPlainArray()
+        {
+            double[] result = new double[3 * MatrixDimension * BlockDimension];
+            int idx = 0;
+
+            for (int j = 0; j < MatrixDimension; ++j)
+            {
+                for (int i = (j == 0 ? 1 : 0); i < (j == (MatrixDimension - 1) ? 2 : 3); ++i)
+                {
+                    for (int k = 0; k < BlockDimension; ++k)
+                    {
+                        result[idx] = matrix[i][j][k];
+                        ++idx;
+                    }
+                }
+            }
+            return result;
+        }
         //---------------
         // Static methods
         //---------------
